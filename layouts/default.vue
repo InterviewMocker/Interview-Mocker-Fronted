@@ -11,7 +11,7 @@ const navItems = [
 
 const handleLogout = async () => {
   await authStore.logout()
-  navigateTo('/login')
+  navigateTo('/auth/login')
 }
 </script>
 
@@ -54,7 +54,7 @@ const handleLogout = async () => {
             </template>
             <template v-else>
               <UButton 
-                to="/login" 
+                to="/auth/login" 
                 color="neutral" 
                 variant="ghost" 
                 size="sm"

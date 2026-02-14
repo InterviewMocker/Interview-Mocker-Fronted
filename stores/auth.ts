@@ -35,42 +35,62 @@ export const useAuthStore = defineStore('auth', () => {
 
   // Actions
   async function login(loginData: LoginRequest): Promise<TokenResponse> {
-    const response = await $fetch<ApiResponse<TokenResponse>>(`${baseURL}/auth/login`, {
-      method: 'POST',
-      body: loginData
-    })
+    try {
+      const response = await $fetch<ApiResponse<TokenResponse>>(`${baseURL}/auth/login`, {
+        method: 'POST',
+        body: loginData
+      })
 
-    if (response.code !== 200) {
-      throw new Error(response.message)
+      if (response.code !== 200) {
+        throw { code: response.code, message: response.message }
+      }
+
+      const data = response.data
+
+      // 保存 Token 和用户信息
+      token.value = data.access_token
+      refreshToken.value = data.refresh_token
+      user.value = data.user
+
+      if (import.meta.client) {
+        localStorage.setItem(TOKEN_KEY, data.access_token)
+        localStorage.setItem(REFRESH_TOKEN_KEY, data.refresh_token)
+        localStorage.setItem(USER_KEY, JSON.stringify(data.user))
+      }
+
+      return data
+    } catch (error: any) {
+      // 处理 $fetch 的 HTTP 错误和业务错误
+      if (error?.data?.message) {
+        throw { code: error.data.code || error.statusCode, message: error.data.message }
+      } else if (error?.message) {
+        throw { code: error.code || 500, message: error.message }
+      }
+      throw { code: 500, message: '网络错误，请稍后重试' }
     }
-
-    const data = response.data
-
-    // 保存 Token 和用户信息
-    token.value = data.access_token
-    refreshToken.value = data.refresh_token
-    user.value = data.user
-
-    if (import.meta.client) {
-      localStorage.setItem(TOKEN_KEY, data.access_token)
-      localStorage.setItem(REFRESH_TOKEN_KEY, data.refresh_token)
-      localStorage.setItem(USER_KEY, JSON.stringify(data.user))
-    }
-
-    return data
   }
 
   async function register(registerData: RegisterRequest): Promise<User> {
-    const response = await $fetch<ApiResponse<User>>(`${baseURL}/auth/register`, {
-      method: 'POST',
-      body: registerData
-    })
+    try {
+      const response = await $fetch<ApiResponse<User>>(`${baseURL}/auth/register`, {
+        method: 'POST',
+        body: registerData
+      })
 
-    if (response.code !== 200) {
-      throw new Error(response.message)
+      if (response.code !== 200) {
+        throw { code: response.code, message: response.message }
+      }
+
+      return response.data
+    } catch (error: any) {
+      // 处理 $fetch 的 HTTP 错误和业务错误
+      if (error?.data?.message) {
+        throw { code: error.data.code || error.statusCode, message: error.data.message }
+      } else if (error?.message) {
+        throw { code: error.code || 500, message: error.message }
+      }
+      throw { code: 500, message: '网络错误，请稍后重试' }
     }
-
-    return response.data
   }
 
   async function logout(): Promise<void> {

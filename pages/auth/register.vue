@@ -55,10 +55,13 @@ const handleRegister = async () => {
       title: '注册成功！请登录',
       color: 'success'
     })
-    navigateTo('/login')
+    navigateTo('/auth/login')
   } catch (error: any) {
+    // 处理后端返回的错误格式 {code, message}
+    const errorMessage = error?.message || '注册失败，请重试'
     toast.add({
-      title: error.message || '注册失败，请重试',
+      title: '注册失败',
+      description: errorMessage,
       color: 'error'
     })
   } finally {
@@ -181,7 +184,7 @@ const handleRegister = async () => {
       <template #footer>
         <div class="text-center text-sm">
           <span class="text-gray-400">已有账号？</span>
-          <NuxtLink to="/login" class="text-primary-400 hover:text-primary-300 ml-1">
+          <NuxtLink to="/auth/login" class="text-primary-400 hover:text-primary-300 ml-1">
             立即登录
           </NuxtLink>
         </div>

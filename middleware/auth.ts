@@ -2,11 +2,11 @@ export default defineNuxtRouteMiddleware((to) => {
   const authStore = useAuthStore()
 
   // 白名单路由
-  const whiteList = ['/login', '/register']
+  const whiteList = ['/auth/login', '/auth/register']
 
   if (whiteList.includes(to.path)) {
     // 如果已登录且访问登录页，跳转到首页
-    if (authStore.isLoggedIn && to.path === '/login') {
+    if (authStore.isLoggedIn && to.path === '/auth/login') {
       return navigateTo('/')
     }
     return
@@ -15,7 +15,7 @@ export default defineNuxtRouteMiddleware((to) => {
   // 未登录跳转到登录页
   if (!authStore.isLoggedIn) {
     return navigateTo({
-      path: '/login',
+      path: '/auth/login',
       query: { redirect: to.fullPath }
     })
   }

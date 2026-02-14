@@ -38,8 +38,11 @@ const handleLogin = async () => {
     const redirect = route.query.redirect as string
     navigateTo(redirect || '/')
   } catch (error: any) {
+    // 处理后端返回的错误格式 {code, message}
+    const errorMessage = error?.message || '登录失败，请重试'
     toast.add({
-      title: error.message || '登录失败，请重试',
+      title: '登录失败',
+      description: errorMessage,
       color: 'error'
     })
   } finally {
@@ -106,7 +109,7 @@ const handleLogin = async () => {
       <template #footer>
         <div class="text-center text-sm">
           <span class="text-gray-400">还没有账号？</span>
-          <NuxtLink to="/register" class="text-primary-400 hover:text-primary-300 ml-1">
+          <NuxtLink to="/auth/register" class="text-primary-400 hover:text-primary-300 ml-1">
             立即注册
           </NuxtLink>
         </div>
